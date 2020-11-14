@@ -47,9 +47,13 @@
             this.Dimensions_groupBox = new System.Windows.Forms.GroupBox();
             this.Height_label = new System.Windows.Forms.Label();
             this.Width_label = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.Fill_radioButton = new System.Windows.Forms.RadioButton();
+            this.Draw_radioButton = new System.Windows.Forms.RadioButton();
             this.ShapesGroupbox.SuspendLayout();
             this.SizegroupBox.SuspendLayout();
             this.Dimensions_groupBox.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // Canvaspanel
@@ -238,7 +242,7 @@
             this.Dimensions_groupBox.Controls.Add(this.Width_textBox);
             this.Dimensions_groupBox.Controls.Add(this.Width_label);
             this.Dimensions_groupBox.Font = new System.Drawing.Font("Verdana", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Dimensions_groupBox.Location = new System.Drawing.Point(720, 167);
+            this.Dimensions_groupBox.Location = new System.Drawing.Point(720, 237);
             this.Dimensions_groupBox.Name = "Dimensions_groupBox";
             this.Dimensions_groupBox.Size = new System.Drawing.Size(403, 110);
             this.Dimensions_groupBox.TabIndex = 9;
@@ -267,11 +271,48 @@
             this.Width_label.TabIndex = 9;
             this.Width_label.Text = "Width:";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.Fill_radioButton);
+            this.groupBox1.Controls.Add(this.Draw_radioButton);
+            this.groupBox1.Font = new System.Drawing.Font("Verdana", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(720, 158);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(403, 73);
+            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Draw/Fill";
+            // 
+            // Fill_radioButton
+            // 
+            this.Fill_radioButton.AutoSize = true;
+            this.Fill_radioButton.Location = new System.Drawing.Point(253, 32);
+            this.Fill_radioButton.Name = "Fill_radioButton";
+            this.Fill_radioButton.Size = new System.Drawing.Size(65, 29);
+            this.Fill_radioButton.TabIndex = 1;
+            this.Fill_radioButton.Text = "Fill";
+            this.Fill_radioButton.UseVisualStyleBackColor = true;
+            this.Fill_radioButton.CheckedChanged += new System.EventHandler(this.Draw_Fill_CheckedChanged);
+            // 
+            // Draw_radioButton
+            // 
+            this.Draw_radioButton.AutoSize = true;
+            this.Draw_radioButton.Checked = true;
+            this.Draw_radioButton.Location = new System.Drawing.Point(73, 32);
+            this.Draw_radioButton.Name = "Draw_radioButton";
+            this.Draw_radioButton.Size = new System.Drawing.Size(92, 29);
+            this.Draw_radioButton.TabIndex = 0;
+            this.Draw_radioButton.TabStop = true;
+            this.Draw_radioButton.Text = "Draw";
+            this.Draw_radioButton.UseVisualStyleBackColor = true;
+            this.Draw_radioButton.CheckedChanged += new System.EventHandler(this.Draw_Fill_CheckedChanged);
+            // 
             // PainterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1135, 494);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.Dimensions_groupBox);
             this.Controls.Add(this.TitlelabelForMouseLocation);
             this.Controls.Add(this.MouseLoactionlabel);
@@ -290,6 +331,8 @@
             this.SizegroupBox.PerformLayout();
             this.Dimensions_groupBox.ResumeLayout(false);
             this.Dimensions_groupBox.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -315,6 +358,9 @@
         private System.Windows.Forms.GroupBox Dimensions_groupBox;
         private System.Windows.Forms.Label Height_label;
         private System.Windows.Forms.Label Width_label;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton Fill_radioButton;
+        private System.Windows.Forms.RadioButton Draw_radioButton;
     }
 }
 

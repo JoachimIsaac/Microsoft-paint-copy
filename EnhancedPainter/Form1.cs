@@ -9,6 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections;
 
 namespace EnhancedPainter
 {
@@ -50,8 +51,27 @@ namespace EnhancedPainter
             Width_textBox.Visible = false;
             Height_textBox.Visible = false;
             
+
+
         }
 
+        private void HideSizeSection()
+        {
+            SizegroupBox.Visible = false;
+            SizeSmallradioButton.Visible = false;
+            SizeMediumradioButton.Visible = false;
+            SizeLargeradioButton.Visible = false;
+            LineradioButton.Visible = false;
+        }
+
+        private void RevealSizeSection()
+        {
+            SizegroupBox.Visible = true;
+            SizeSmallradioButton.Visible = true;
+            SizeMediumradioButton.Visible = true;
+            SizeLargeradioButton.Visible = true;
+            LineradioButton.Visible = true;
+        }
 
 
 
@@ -164,6 +184,13 @@ namespace EnhancedPainter
 
 
 
+        private void FillRectangleOnCanvas(MouseEventArgs e)
+        {
+
+        }
+
+
+
         private void Size_CheckedChanged(object sender, EventArgs e)
         {
             if (LineradioButton.Checked)
@@ -264,10 +291,16 @@ namespace EnhancedPainter
             }
             else
             {
-                RevealDimensionsSection();
+                if(Fill_radioButton.Checked != true)
+                {
+                    RevealDimensionsSection();
+                }
+                
+
             }
-            
         }
+
+
 
 
 
@@ -281,7 +314,24 @@ namespace EnhancedPainter
             }
         }
 
+        private void Draw_Fill_CheckedChanged(object sender, EventArgs e)
+        {
+            if (Draw_radioButton.Checked)
+            {
+                RevealSizeSection();
+                
+                if(LineradioButton.Checked != true)
+                {
+                    RevealDimensionsSection();
+                }
+            }
+            else
+            {
+                HideSizeSection();
+                HideDimensionsSection();
+            }
 
+        }
     }
 }
 
@@ -304,9 +354,17 @@ public class ShapesBuilder : Form
 
         private List<Tuple<Pen, Rectangle>> ListRecsForEllipse = new List<Tuple<Pen, Rectangle>>();
 
+        Hashtable Rectangle_and_AreaToFill = new Hashtable();
+        Hashtable Ellipse_and_AreaToFill = new Hashtable();
 
-        //Constructor 
-        public ShapesBuilder(Graphics g){
+
+        /// private Tuple<Point, int, int> RectangleAreaToFill;
+
+        ///private Tuple<Point, int, int> EllipseAreaToFill;
+
+
+    //Constructor 
+    public ShapesBuilder(Graphics g){
             this.graphics = g;
         }
 
@@ -426,8 +484,16 @@ public class ShapesBuilder : Form
             this.rect = new Rectangle(SPoint, size);
 
             this.graphics.DrawRectangle(this.pen, this.rect);
-     
-            this.ListOfRectangles.Add(new Tuple<Pen,Rectangle>((Pen)this.pen.Clone(),this.rect));
+
+            Tuple<Pen, Rectangle> pen_and_rectangle = new Tuple<Pen, Rectangle>((Pen)this.pen.Clone(), this.rect);
+            Tuple<Point, int, int> point_and_dimensions = new Tuple<Point, int, int>(SPoint, width, height);
+
+           this.ListOfRectangles.Add( pen_and_rectangle);
+
+
+
+        //add to rectangle hashset 
+            this.Rectangle_and_AreaToFill.Add(point_and_dimensions, pen_and_rectangle);
         }
 
 
@@ -440,13 +506,19 @@ public class ShapesBuilder : Form
 
             this.graphics.DrawEllipse(this.pen, this.rect);
 
-            this.ListRecsForEllipse.Add(new Tuple<Pen, Rectangle>((Pen)this.pen.Clone(), this.rect));
-        }
+            Tuple<Pen, Rectangle> pen_and_rectangle = new Tuple<Pen, Rectangle>((Pen)this.pen.Clone(), this.rect);
+            Tuple<Point, int, int> point_and_dimensions = new Tuple<Point, int, int>(SPoint, width, height);
+
+            this.ListRecsForEllipse.Add(pen_and_rectangle);
+            //add to Elispe hash set 
+
+            this.Ellipse_and_AreaToFill.Add(point_and_dimensions, pen_and_rectangle);
+    }
 
 
 
-        //Redraws Canvas of all shapes that was are currently drawn.
-        public void RedrawCanvas()
+    //Redraws Canvas of all shapes that was are currently drawn.
+    public void RedrawCanvas()
         {
             if (this.ListOfLinePoints.Count != 0)
             {
