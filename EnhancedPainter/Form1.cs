@@ -17,12 +17,8 @@ namespace EnhancedPainter
     public partial class PainterForm : Form
     {
         public Graphics graphics;
-        // private bool StartingPoint = true;
-        //private List<Tuple<Point, Point>> ListOfLinePoints = new List<Tuple<Point, Point>>();
         private List<Rectangle> ListOfRectangles = new List<Rectangle>();
         private List<Rectangle> ListRecsForEllipse = new List<Rectangle>();
-        // private Point SPoint;
-        // private Point EPoint;
         private Pen pen = new Pen(Color.Black, 4.0F);
         private Rectangle rect = new Rectangle(0, 0, 100, 50);
         private ShapesBuilder SBuilder;
@@ -36,6 +32,7 @@ namespace EnhancedPainter
             InitializeComponent();
             graphics = Canvaspanel.CreateGraphics();
             SBuilder = new ShapesBuilder(graphics);
+            HideDimensionsSection();
         }
 
 
@@ -47,12 +44,27 @@ namespace EnhancedPainter
             ///////
             Canvaspanel.Invalidate();
             SBuilder.ClearListsOfShapes();
-            //ListOfLinePoints.Clear();
-            //ListOfRectangles.Clear();
-            //ListRecsForEllipse.Clear();
+ 
         }
 
 
+        private void HideDimensionsSection()
+        {
+            Dimensions_groupBox.Visible = false;
+            Width_label.Visible = false;
+            Height_label.Visible = false;
+            Width_textBox.Visible = false;
+            Height_textBox.Visible = false;
+        }
+
+        private void RevealDimensionsSection()
+        {
+            Dimensions_groupBox.Visible = true;
+            Width_label.Visible = true;
+            Height_label.Visible = true;
+            Width_textBox.Visible = true;
+            Height_textBox.Visible = true;
+        }
 
         private void Canvaspanel_MouseDown(object sender, MouseEventArgs e)
         {
@@ -90,34 +102,16 @@ namespace EnhancedPainter
         {//////////
             if (SBuilder.isStarting() == true)
             {
-
-                //SPoint = new Point(e.X, e.Y);
-
-                //StartingPoint = false;
-
                 SBuilder.setSPoint(new Point(e.X, e.Y));
                 SBuilder.setCurrentStartingState(false);
-
                 MouseLoactionlabel.Text = $"Starting point X:{SBuilder.getSPoint().X} | Y:{SBuilder.getSPoint().Y}";
-
             }
             else
             {
-
-                //EPoint = new Point(e.X, e.Y);
-                //StartingPoint = true;
-                // graphics.DrawLine(pen, SPoint, EPoint);
-                //ListOfLinePoints.Add(new Tuple<Point,Point>(SPoint, EPoint));
-
-
-
                 SBuilder.setEPoint(new Point(e.X, e.Y));
                 SBuilder.setCurrentStartingState(true);
-
                 SBuilder.DrawALine();
                 SBuilder.AddLineToListOfLines(new Tuple<Point, Point>(SBuilder.getSPoint(), SBuilder.getEPoint()));
-
-
                 MouseLoactionlabel.Text = $"Last Ending point X:{SBuilder.getEPoint().X} | Y:{SBuilder.getEPoint().Y}";
             }
         }
@@ -127,42 +121,15 @@ namespace EnhancedPainter
 
             if (SBuilder.isStarting() == true)
             {
-
-                //SPoint = new Point(e.X, e.Y);
-
-                //StartingPoint = false;
-
                 SBuilder.setSPoint(new Point(e.X, e.Y));
-                SBuilder.setCurrentStartingState(false);
-
-                MouseLoactionlabel.Text = $"Starting point X:{SBuilder.getSPoint().X} | Y:{SBuilder.getSPoint().Y}";
-
-            }
-            else
-            {
-
-                //EPoint = new Point(e.X, e.Y);
-                //StartingPoint = true;
-                // graphics.DrawLine(pen, SPoint, EPoint);
-                //ListOfLinePoints.Add(new Tuple<Point,Point>(SPoint, EPoint));
-
-
-
-                SBuilder.setEPoint(new Point(e.X, e.Y));
                 SBuilder.setCurrentStartingState(true);
-                SBuilder.DrawNewRectangle();
-                Console.WriteLine("HIII");
-                //draw rectangle
-                //add point to list of rectangle 
+                Tuple<int, int> dimnesions = GetRectangleDimensions();
+                SBuilder.DrawNewRectangle(dimnesions.Item1,dimnesions.Item2);
                 SBuilder.AddRectangleToListOfRectangles();
-                /// SBuilder.AddLineToListOfLines(new Tuple<Point, Point>(SBuilder.getSPoint(), SBuilder.getEPoint()));
-
-
                 MouseLoactionlabel.Text = $"Last Ending point X:{SBuilder.getEPoint().X} | Y:{SBuilder.getEPoint().Y}";
+                //MouseLoactionlabel.Text = $"Starting point X:{SBuilder.getSPoint().X} | Y:{SBuilder.getSPoint().Y}";
+
             }
-
-
-
 
         }
 
@@ -200,40 +167,30 @@ namespace EnhancedPainter
             }
             else if (RectangleradioButton.Checked)
             {
-                ChangeRectangleSize();
+            
                 ChangePenWidth(sender);
             }
             else if (OvalradioButton.Checked)
             {
-                ChangeRectangleSize();
+              
                 ChangePenWidth(sender);
             }
         }
 
 
-        private void ChangeRectangleSize()
+        private Tuple<int, int>  GetRectangleDimensions()
         {
-            if (SizeSmallradioButton.Checked)
-            {
 
-                rect = new Rectangle();
-                rect.Width = 100;
-                rect.Height = 50;
-            }
-            else if (SizeMediumradioButton.Checked)
-            {
+            
 
-                rect = new Rectangle();
-                rect.Width = 150;
-                rect.Height = 100;
-            }
-            else
+            if (Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
             {
-
-                rect = new Rectangle();
-                rect.Width = 200;
-                rect.Height = 150;
+                int width = int.Parse(Width_textBox.Text);
+                int height = int.Parse(Height_textBox.Text);
+                return new Tuple<int, int>(width, height);
             }
+
+            return new Tuple<int, int>(0, 0);
         }
 
 
@@ -243,21 +200,25 @@ namespace EnhancedPainter
 
             if (checkedName == "SizeSmallradioButton")
             {
-                ///pen.Width = 4.0F;
+            
                 SBuilder.setPenWidth(4.0F);
             }
             else if (checkedName == "SizeMediumradioButton")
             {
-                //pen.Width = 10.0F;
+        
                 SBuilder.setPenWidth(10.0F);
             }
             else
             {
 
                 SBuilder.setPenWidth(20.0F);
-                //pen.Width = 20.0F;
+        
             }
         }
+
+
+
+       
 
 
         private void ChooseColorbutton_Click(object sender, EventArgs e)
@@ -288,36 +249,39 @@ namespace EnhancedPainter
         private void Canvaspanel_paint(object sender, PaintEventArgs e)
         {//////////////
             SBuilder.RedrawCanvas();
+        }
 
-
-
-            //if (ListOfLinePoints.Count != 0)
-            // {
-            //    foreach (var pointPair in ListOfLinePoints)
-            //     {
-            //         graphics.DrawLine(pen, pointPair.Item1, pointPair.Item2);
-            //     }
-            //  }
-
-            //  if (ListOfRectangles.Count != 0)
-            // {
-            //     foreach (var rectangle in ListOfRectangles)
-            //     {
-            //         graphics.DrawRectangle(pen, rectangle);
-            //     }
-            //  }
-
-            //  if (ListRecsForEllipse.Count != 0)
-            //  {
-            //      foreach (var rectangle in ListRecsForEllipse)
-            //    {
-            //      graphics.DrawEllipse(pen, rectangle);
-            //  }
-            // }
+        private void ShapeCheckChange(object sender, EventArgs e)
+        {
+            if (LineradioButton.Checked)
+            {
+                HideDimensionsSection();
+            }
+            else if (RectangleradioButton.Checked)
+            {
+                RevealDimensionsSection();
+            }
+            else if (OvalradioButton.Checked)
+            {
+                RevealDimensionsSection();
+            }
         }
 
 
+        //Prevents user from inputting anything but integers and floats, flaot only to one decimal point.
+        private void TextboxKeyPress(object sender, KeyPressEventArgs e)
+        {
+            ///Allow only integers
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
 
+          
+            
+        }
+
+       
     }
 }
 
@@ -407,50 +371,20 @@ public class ShapesBuilder : Form
             this.ListOfRectangles.Add(this.rect);
         }
 
-        private void createNewRectangle()
+        
+
+        public void DrawNewRectangle(int width, int height)
         {
 
-            // get top left 
-            //Try doing it with only one point instead. 
-            //User should input width and height. 
+        
+        //this.graphics.DrawRectangle(this.pen, this.rect);
+        Size size = new Size((int)width, (int)height);
 
+        this.rect = new Rectangle(SPoint, size);
+        this.graphics.DrawRectangle(this.pen, this.rect);
+        this.ListOfRectangles.Add(rect);
 
-            Point topLeft;
-            Point bottomRight;
-
-            if (this.SPoint.X < EPoint.X)
-            {
-                topLeft = this.SPoint;
-                bottomRight = this.EPoint;
-            }
-            else
-            {
-
-            }
-
-
-
-            ///var size = new Size(topLeft.X - bottomRight.X, topLeft.Y - bottomRight.Y);
-
-            //int minX = Math.Min(SPoint.X, EPoint.X);
-            //int maxX = Math.Max(SPoint.X, EPoint.X);
-            //int minY = Math.Min(SPoint.Y, EPoint.Y);
-            //int maxY = Math.Max(SPoint.Y, EPoint.Y);
-
-            Console.WriteLine("drawwing");
-            //this.rect = new Rectangle(topLeft,size);
-            //this.graphics.DrawRectangle(this.pen, new Rectangle(topLeft, size));
-            //this.ListRecsForEllipse.Add(rect);
-        }
-
-        public void DrawNewRectangle()
-        {
-
-            createNewRectangle();
-            //this.graphics.DrawRectangle(this.pen, this.rect);
-
-
-        }
+    }
 
 
 
@@ -513,17 +447,7 @@ public class ShapesBuilder : Form
             return this.pen.Width;
         }
 
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            // 
-            // ShapesBuilder
-            // 
-            this.ClientSize = new System.Drawing.Size(926, 471);
-            this.Name = "ShapesBuilder";
-            this.ResumeLayout(false);
-
-        }
+        
     }
 
 
