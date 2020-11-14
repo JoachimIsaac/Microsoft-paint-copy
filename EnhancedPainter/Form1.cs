@@ -94,7 +94,10 @@ namespace EnhancedPainter
             /////////
             if (LineradioButton.Checked)
             {
-                DrawLineOnCanvas(e);
+                if (Draw_radioButton.Checked) {
+                    DrawLineOnCanvas(e);
+                }
+
             }
             else if (RectangleradioButton.Checked)
             {
@@ -103,7 +106,14 @@ namespace EnhancedPainter
                 if (SBuilder.isStarting() == true)
                 {
                     MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
-                    DrawRectangleOnCanvas(e);
+                    if (Draw_radioButton.Checked)
+                    {
+                        DrawRectangleOnCanvas(e);
+                    }
+                    else
+                    {
+                        FillRectangleOnCanvas(e);
+                    }
                 }
             }
             else if (OvalradioButton.Checked)
@@ -113,7 +123,15 @@ namespace EnhancedPainter
                 if (SBuilder.isStarting() == true)
                 {
                     MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
-                    DrawOvalOnCanvas(e);
+
+                    if (Draw_radioButton.Checked)
+                    {
+                        DrawOvalOnCanvas(e);
+                    }
+                    else
+                    {
+                        FillRectangleOnCanvas(e);
+                    }
                 }
             }
         }
@@ -186,7 +204,8 @@ namespace EnhancedPainter
 
         private void FillRectangleOnCanvas(MouseEventArgs e)
         {
-
+            Point current_point = new Point(e.X, e.Y);
+            this.SBuilder.Fill_Closest_Rectangle(current_point);
         }
 
 
@@ -354,13 +373,14 @@ public class ShapesBuilder : Form
 
         private List<Tuple<Pen, Rectangle>> ListRecsForEllipse = new List<Tuple<Pen, Rectangle>>();
 
-        Hashtable Rectangle_and_AreaToFill = new Hashtable();
-        Hashtable Ellipse_and_AreaToFill = new Hashtable();
+        //Hashtable Rectangle_and_AreaToFill = new Hashtable();
+        //Hashtable Ellipse_and_AreaToFill = new Hashtable();
+        Dictionary<Tuple<Point, int, int>,Tuple<Pen,Rectangle>>  Rectangles_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>>();
+         Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>> Ellipses_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>>();
 
+    /// private Tuple<Point, int, int> RectangleAreaToFill;
 
-        /// private Tuple<Point, int, int> RectangleAreaToFill;
-
-        ///private Tuple<Point, int, int> EllipseAreaToFill;
+    ///private Tuple<Point, int, int> EllipseAreaToFill;
 
 
     //Constructor 
@@ -447,6 +467,7 @@ public class ShapesBuilder : Form
             ListOfLinePoints.Clear();
             ListOfRectangles.Clear();
             ListRecsForEllipse.Clear();
+        Rectangles_and_AreasToFill.Clear();
 
         }
 
@@ -491,10 +512,11 @@ public class ShapesBuilder : Form
            this.ListOfRectangles.Add( pen_and_rectangle);
 
 
-
+            
         //add to rectangle hashset 
-            this.Rectangle_and_AreaToFill.Add(point_and_dimensions, pen_and_rectangle);
-        }
+        // this.Rectangle_and_AreaToFill.Add(point_and_dimensions, pen_and_rectangle);
+        this.Rectangles_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle);
+    }
 
 
         //Draws Ellipse on canvas
@@ -510,15 +532,79 @@ public class ShapesBuilder : Form
             Tuple<Point, int, int> point_and_dimensions = new Tuple<Point, int, int>(SPoint, width, height);
 
             this.ListRecsForEllipse.Add(pen_and_rectangle);
-            //add to Elispe hash set 
+        //add to Elispe hash set 
 
-            this.Ellipse_and_AreaToFill.Add(point_and_dimensions, pen_and_rectangle);
+        this.Ellipses_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle);
     }
 
 
 
-    //Redraws Canvas of all shapes that was are currently drawn.
-    public void RedrawCanvas()
+        public void Fill_Closest_Rectangle(Point current_point,bool isRectangle){
+
+   
+
+        SolidBrush Brush = new SolidBrush(pen.Color);
+
+        if (isRectangle) {
+
+            Rectangle rectToFill = this.pick_rectangle_to_fill(this.Rectangles_and_AreasToFill, current_point);
+            graphics.FillRectangle(Brush, rectToFill);
+        }
+        else
+        {
+            Rectangle rectToFill = this.pick_rectangle_to_fill(this.Ellipses_and_AreasToFill, current_point);
+            graphics.FillEllipse(Brush, rectToFill);
+        }
+        
+
+
+        
+        
+        
+        }
+
+
+    public Rectangle pick_rectangle_to_fill(Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>> shapes_and_points,Point current_point)
+    {
+        int max_remainder = int.MinValue;
+        Rectangle rectToFill = new Rectangle();
+
+        foreach (var kvp in shapes_and_points)
+        {
+            Point firstPoint = new Point(kvp.Key.Item1.X, kvp.Key.Item1.Y);
+            Point secondPoint = new Point(kvp.Key.Item1.X + kvp.Key.Item2, kvp.Key.Item1.Y + kvp.Key.Item3);
+
+
+            if (this.FoundPoint(firstPoint, secondPoint, current_point))
+            {
+                int current_difference = (secondPoint.X * secondPoint.Y) - (current_point.X * secondPoint.Y);
+
+                if (max_remainder < current_difference)
+                {
+                    max_remainder = current_difference;
+                    rectToFill = kvp.Value.Item2;
+                }
+            }
+        }
+
+        return rectToFill;
+
+
+    }
+
+
+    public bool FoundPoint(Point sp, Point ep,Point curr)
+    {
+        if (curr.X > sp.X && curr.X < ep.X &&
+           curr.Y > sp.Y && curr.Y < ep.Y)
+            return true;
+
+        return false;
+    }
+
+
+        //Redraws Canvas of all shapes that was are currently drawn.
+        public void RedrawCanvas()
         {
             if (this.ListOfLinePoints.Count != 0)
             {
