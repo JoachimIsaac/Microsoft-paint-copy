@@ -1,4 +1,18 @@
-﻿using System;
+﻿
+
+
+
+
+
+
+
+
+
+
+
+
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -130,7 +144,8 @@ namespace EnhancedPainter
                     }
                     else
                     {
-                        FillRectangleOnCanvas(e);
+
+                        FillEllispeOnCanvas(e);
                     }
                 }
             }
@@ -205,9 +220,15 @@ namespace EnhancedPainter
         private void FillRectangleOnCanvas(MouseEventArgs e)
         {
             Point current_point = new Point(e.X, e.Y);
-            this.SBuilder.Fill_Closest_Rectangle(current_point);
+            this.SBuilder.Fill_Closest_Rectangle(current_point,true);
         }
 
+
+        private void FillEllispeOnCanvas(MouseEventArgs e)
+        {
+            Point current_point = new Point(e.X, e.Y);
+            this.SBuilder.Fill_Closest_Rectangle(current_point, false);
+        }
 
 
         private void Size_CheckedChanged(object sender, EventArgs e)
@@ -373,14 +394,10 @@ public class ShapesBuilder : Form
 
         private List<Tuple<Pen, Rectangle>> ListRecsForEllipse = new List<Tuple<Pen, Rectangle>>();
 
-        //Hashtable Rectangle_and_AreaToFill = new Hashtable();
-        //Hashtable Ellipse_and_AreaToFill = new Hashtable();
-        Dictionary<Tuple<Point, int, int>,Tuple<Pen,Rectangle>>  Rectangles_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>>();
-         Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>> Ellipses_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>>();
+        Dictionary<Tuple<Point, int, int>,Tuple<Pen,Rectangle, bool,Color>>  Rectangles_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle,bool,Color>>();
+        Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle,bool,Color>> Ellipses_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool,Color>>();
 
-    /// private Tuple<Point, int, int> RectangleAreaToFill;
-
-    ///private Tuple<Point, int, int> EllipseAreaToFill;
+ 
 
 
     //Constructor 
@@ -467,7 +484,7 @@ public class ShapesBuilder : Form
             ListOfLinePoints.Clear();
             ListOfRectangles.Clear();
             ListRecsForEllipse.Clear();
-        Rectangles_and_AreasToFill.Clear();
+            Rectangles_and_AreasToFill.Clear();
 
         }
 
@@ -507,6 +524,7 @@ public class ShapesBuilder : Form
             this.graphics.DrawRectangle(this.pen, this.rect);
 
             Tuple<Pen, Rectangle> pen_and_rectangle = new Tuple<Pen, Rectangle>((Pen)this.pen.Clone(), this.rect);
+            Tuple<Pen, Rectangle, bool,Color> pen_and_rectangle_and_state = new Tuple<Pen, Rectangle,bool,Color>((Pen)this.pen.Clone(), this.rect,false,Color.Transparent);
             Tuple<Point, int, int> point_and_dimensions = new Tuple<Point, int, int>(SPoint, width, height);
 
            this.ListOfRectangles.Add( pen_and_rectangle);
@@ -515,7 +533,7 @@ public class ShapesBuilder : Form
             
         //add to rectangle hashset 
         // this.Rectangle_and_AreaToFill.Add(point_and_dimensions, pen_and_rectangle);
-        this.Rectangles_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle);
+        this.Rectangles_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle_and_state);
     }
 
 
@@ -529,12 +547,14 @@ public class ShapesBuilder : Form
             this.graphics.DrawEllipse(this.pen, this.rect);
 
             Tuple<Pen, Rectangle> pen_and_rectangle = new Tuple<Pen, Rectangle>((Pen)this.pen.Clone(), this.rect);
+            Tuple<Pen, Rectangle, bool,Color> pen_and_rectangle_and_state = new Tuple<Pen, Rectangle, bool,Color>((Pen)this.pen.Clone(), this.rect, false,Color.Transparent);
             Tuple<Point, int, int> point_and_dimensions = new Tuple<Point, int, int>(SPoint, width, height);
 
             this.ListRecsForEllipse.Add(pen_and_rectangle);
-        //add to Elispe hash set 
 
-        this.Ellipses_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle);
+
+        this.Ellipses_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle_and_state);
+
     }
 
 
@@ -553,7 +573,15 @@ public class ShapesBuilder : Form
         else
         {
             Rectangle rectToFill = this.pick_rectangle_to_fill(this.Ellipses_and_AreasToFill, current_point);
-            graphics.FillEllipse(Brush, rectToFill);
+
+            if (rectToFill.Width == 0 && rectToFill.Height == 0 && rectToFill.X == 0 && rectToFill.Y == 0)
+            {
+                return;
+            }
+            else
+            { 
+                graphics.FillEllipse(Brush, rectToFill);
+            }
         }
         
 
@@ -564,10 +592,11 @@ public class ShapesBuilder : Form
         }
 
 
-    public Rectangle pick_rectangle_to_fill(Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle>> shapes_and_points,Point current_point)
+    public Rectangle pick_rectangle_to_fill(Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle,bool,Color>> shapes_and_points,Point current_point)
     {
         int max_remainder = int.MinValue;
-        Rectangle rectToFill = new Rectangle();
+        Rectangle rectToFill = new Rectangle(0,0,0,0);
+        Tuple<Point, int, int> key = new Tuple<Point, int, int>(new Point(0,0),0,0);
 
         foreach (var kvp in shapes_and_points)
         {
@@ -575,19 +604,30 @@ public class ShapesBuilder : Form
             Point secondPoint = new Point(kvp.Key.Item1.X + kvp.Key.Item2, kvp.Key.Item1.Y + kvp.Key.Item3);
 
 
-            if (this.FoundPoint(firstPoint, secondPoint, current_point))
-            {
-                int current_difference = (secondPoint.X * secondPoint.Y) - (current_point.X * secondPoint.Y);
-
-                if (max_remainder < current_difference)
+           
+                if (this.FoundPoint(firstPoint, secondPoint, current_point))
                 {
-                    max_remainder = current_difference;
-                    rectToFill = kvp.Value.Item2;
+                    int current_difference = (secondPoint.X * secondPoint.Y) - (current_point.X * secondPoint.Y);
+
+                    if (max_remainder < current_difference)
+                    {
+                        max_remainder = current_difference;
+
+                        rectToFill = kvp.Value.Item2;
+                        key = kvp.Key;
+                    }
                 }
-            }
         }
 
-        return rectToFill;
+        if (shapes_and_points.ContainsKey(key))
+        {
+            shapes_and_points[key] = new Tuple<Pen, Rectangle, bool, Color>(shapes_and_points[key].Item1, shapes_and_points[key].Item2, true, this.pen.Color);
+            return rectToFill;
+        }
+        else
+        {
+            return new Rectangle(0, 0, 0, 0);
+        }
 
 
     }
@@ -606,7 +646,9 @@ public class ShapesBuilder : Form
         //Redraws Canvas of all shapes that was are currently drawn.
         public void RedrawCanvas()
         {
-            if (this.ListOfLinePoints.Count != 0)
+        
+
+        if (this.ListOfLinePoints.Count != 0)
             {
                 foreach (var pointPair in this.ListOfLinePoints)
                 {
@@ -629,7 +671,37 @@ public class ShapesBuilder : Form
                    graphics.DrawEllipse(pen_and_rect.Item1, pen_and_rect.Item2);
                 }
             }
+
+
+
+            if(this.Rectangles_and_AreasToFill.Count != 0)
+            {
+                foreach(var KvP in this.Rectangles_and_AreasToFill){
+                    
+                    if(KvP.Value.Item3 == true)
+                {
+                    SolidBrush Brush = new SolidBrush(KvP.Value.Item4);
+                    graphics.FillRectangle(Brush, KvP.Value.Item2);
+                }
+
+                }
+            }
+
+        if (this.Ellipses_and_AreasToFill.Count != 0)
+        {
+            foreach (var KvP in this.Ellipses_and_AreasToFill)
+            {
+
+                if (KvP.Value.Item3 == true)
+                {
+                    SolidBrush Brush = new SolidBrush(KvP.Value.Item4);
+                    graphics.FillEllipse(Brush, KvP.Value.Item2);
+                }
+
+            }
         }
+
+    }
 
 
         

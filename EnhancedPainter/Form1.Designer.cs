@@ -61,7 +61,7 @@
             this.Canvaspanel.BackColor = System.Drawing.Color.White;
             this.Canvaspanel.Location = new System.Drawing.Point(13, 12);
             this.Canvaspanel.Name = "Canvaspanel";
-            this.Canvaspanel.Size = new System.Drawing.Size(695, 466);
+            this.Canvaspanel.Size = new System.Drawing.Size(695, 500);
             this.Canvaspanel.TabIndex = 0;
             this.Canvaspanel.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvaspanel_paint);
             this.Canvaspanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvaspanel_MouseDown);
@@ -170,7 +170,7 @@
             // 
             this.Clearbutton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.Clearbutton.Font = new System.Drawing.Font("Verdana", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Clearbutton.Location = new System.Drawing.Point(727, 439);
+            this.Clearbutton.Location = new System.Drawing.Point(727, 466);
             this.Clearbutton.Name = "Clearbutton";
             this.Clearbutton.Size = new System.Drawing.Size(216, 38);
             this.Clearbutton.TabIndex = 4;
@@ -181,7 +181,7 @@
             // ChooseColorbutton
             // 
             this.ChooseColorbutton.Font = new System.Drawing.Font("Verdana", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChooseColorbutton.Location = new System.Drawing.Point(975, 412);
+            this.ChooseColorbutton.Location = new System.Drawing.Point(975, 439);
             this.ChooseColorbutton.Name = "ChooseColorbutton";
             this.ChooseColorbutton.Size = new System.Drawing.Size(148, 65);
             this.ChooseColorbutton.TabIndex = 5;
@@ -193,7 +193,7 @@
             // 
             this.ColorIndicatorlabel.BackColor = System.Drawing.Color.Black;
             this.ColorIndicatorlabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.ColorIndicatorlabel.Location = new System.Drawing.Point(1019, 368);
+            this.ColorIndicatorlabel.Location = new System.Drawing.Point(1019, 392);
             this.ColorIndicatorlabel.Name = "ColorIndicatorlabel";
             this.ColorIndicatorlabel.Size = new System.Drawing.Size(56, 41);
             this.ColorIndicatorlabel.TabIndex = 6;
@@ -203,7 +203,7 @@
             this.MouseLoactionlabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.MouseLoactionlabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.MouseLoactionlabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MouseLoactionlabel.Location = new System.Drawing.Point(727, 383);
+            this.MouseLoactionlabel.Location = new System.Drawing.Point(726, 413);
             this.MouseLoactionlabel.Name = "MouseLoactionlabel";
             this.MouseLoactionlabel.Size = new System.Drawing.Size(216, 50);
             this.MouseLoactionlabel.TabIndex = 7;
@@ -213,7 +213,7 @@
             this.TitlelabelForMouseLocation.BackColor = System.Drawing.Color.Silver;
             this.TitlelabelForMouseLocation.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.TitlelabelForMouseLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TitlelabelForMouseLocation.Location = new System.Drawing.Point(727, 359);
+            this.TitlelabelForMouseLocation.Location = new System.Drawing.Point(726, 389);
             this.TitlelabelForMouseLocation.Name = "TitlelabelForMouseLocation";
             this.TitlelabelForMouseLocation.Size = new System.Drawing.Size(216, 24);
             this.TitlelabelForMouseLocation.TabIndex = 8;
@@ -311,7 +311,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1135, 494);
+            this.ClientSize = new System.Drawing.Size(1135, 520);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.Dimensions_groupBox);
             this.Controls.Add(this.TitlelabelForMouseLocation);
