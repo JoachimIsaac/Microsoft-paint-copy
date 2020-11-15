@@ -54,7 +54,7 @@ namespace EnhancedPainter
             SBuilder = new ShapesBuilder(graphics);
 
 
-            //Hide the dimensions sections, since the default drawing setting is lines.
+            //Hide the dimensions sections, since the default drawing setting is drawing lines.
             HideDimensionsSection();
         }
 
@@ -126,7 +126,7 @@ namespace EnhancedPainter
 
 
 
-        //Trigger on mouse down  on the panel.
+        //Triggers on mouse down on the panel.
         //Decisions are made based on what radio button is currently checked.
         private void Canvaspanel_MouseDown(object sender, MouseEventArgs e)
         {
@@ -163,12 +163,12 @@ namespace EnhancedPainter
                 {                               //we call the draw oval function.
                     SBuilder.setCurrentStartingState(true);
 
-                    //Enter if this is the starting point and both text boxes are filled.
+                    // if this is the starting point.
                     if (SBuilder.isStarting() == true)
                     {
                         MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
 
-                        //If draw radio button is checked and we have valid dimensions draw an oval on canvas.
+                        //If draw radio button is checked and and both text boxes are filled..
                         if (Draw_radioButton.Checked && Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
                         {
                             DrawOvalOnCanvas(e);
@@ -195,9 +195,9 @@ namespace EnhancedPainter
         {
             if (SBuilder.isStarting() == true)//if this is the starting point.
             {
-                SBuilder.setSPoint(new Point(e.X, e.Y));//set the current point from mouse click.
+                SBuilder.setSPoint(new Point(e.X, e.Y));//set the current point where mouse was clicked.
 
-                //set the current starting state to false, the next time we click we are goingto get an ending point.
+                //set the current starting state to false, the next time we click we are going to get an ending point.
                 SBuilder.setCurrentStartingState(false);
 
                 //Display the mouse position.
@@ -205,7 +205,7 @@ namespace EnhancedPainter
             }
             else
             {
-                //current end point.
+                //set current end point.
                 SBuilder.setEPoint(new Point(e.X, e.Y));
 
                 // reset our start state.
@@ -232,14 +232,16 @@ namespace EnhancedPainter
         //Draws the rectangle on the canvas.
         private void DrawRectangleOnCanvas(MouseEventArgs e)
         {
+
+            //Ensure our state always starts as true for a rectangle.
+            SBuilder.setCurrentStartingState(true);
+
+
             //We only need to click once to draw.
             if (SBuilder.isStarting() == true)
             {
                 //Set current start point.
                 SBuilder.setSPoint(new Point(e.X, e.Y));
-
-                //Ensure our state always starts as true for a rectangle.
-                SBuilder.setCurrentStartingState(true);
 
                 //Get the current rectangle dimensions.
                 Tuple<int, int> dimnesions = GetRectangleDimensions();
@@ -259,14 +261,14 @@ namespace EnhancedPainter
         //Draws the Oval/ellispe on the canvas.
         private void DrawOvalOnCanvas(MouseEventArgs e)
         {
+            //Ensure our state always starts as true for a shape.
+            SBuilder.setCurrentStartingState(true);
+
             // We only need to click once to draw.
             if (SBuilder.isStarting() == true)
             {
                 //Set current start point.
                 SBuilder.setSPoint(new Point(e.X, e.Y));
-
-                //Ensure our state always starts as true for a shape.
-                SBuilder.setCurrentStartingState(true);
 
                 //Get the current  dimensions.
                 Tuple<int, int> dimnesions = GetRectangleDimensions();
@@ -286,7 +288,7 @@ namespace EnhancedPainter
         //Fills the rectangle.
         private void FillRectangleOnCanvas(MouseEventArgs e)
         {
-            //Create point for current position. 
+            //Create point of current position. 
             Point current_point = new Point(e.X, e.Y);
 
             //If this point is in the area of a valid rectangle fill it.
@@ -329,6 +331,7 @@ namespace EnhancedPainter
             try
             {
                 //Grabs the dimensions within the width and height text boxes.
+                //and returns a tuple with the dimensions.
                 if (Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
                 {
                     int width = int.Parse(Width_textBox.Text);
@@ -362,15 +365,15 @@ namespace EnhancedPainter
             string checkedName = ((RadioButton)sender).Name;
 
             //Changes size on checked name. 
-            if (checkedName == "SizeSmallradioButton")
+            if (checkedName == "SizeSmallradioButton")//smallest
             {
                 SBuilder.setPenWidth(4.0F);
             }
-            else if (checkedName == "SizeMediumradioButton")
+            else if (checkedName == "SizeMediumradioButton")//medium
             {
                 SBuilder.setPenWidth(10.0F);
             }
-            else
+            else//largest
             {
                 SBuilder.setPenWidth(20.0F);
             }
@@ -380,8 +383,7 @@ namespace EnhancedPainter
 
 
 
-
-        //Actives the button to choose color
+        //onclick even for the color button, it calls the function that opens the color dialog.
         private void ChooseColorbutton_Click(object sender, EventArgs e)
         {
             OpenColorChooser();//opens color chooser dialog box.
@@ -426,7 +428,7 @@ namespace EnhancedPainter
 
 
 
-        //When the shape radio button is changed, hide dimension's group box and it's content's or reveal them.
+        //When a shape radio button is changed, hide dimension's group box and it's content's or reveal them.
         private void ShapeCheckChange(object sender, EventArgs e)
         {
             if (LineradioButton.Checked)//if line button is checked hide the dimensions section.
@@ -699,16 +701,16 @@ public class ShapesBuilder : Form
 
         this.graphics.DrawEllipse(this.pen, this.rect);
 
-        //Create a tuple that holds the pen and rectangle, clone ensures we have a deep copy of the pen, so that we remeber the original color.
+        //Create a tuple that holds the pen and rectangle, clone ensures we have a deep copy of the pen, so that we remember the original color.
         Tuple<Pen, Rectangle> pen_and_rectangle = new Tuple<Pen, Rectangle>((Pen)this.pen.Clone(), this.rect);
 
 
-        //Create a tuple that holds the pen,rectangle, filled state represented by bool, and Color.
+        //Create a tuple that holds the pen, rectangle, filled state represented by bool, and Color.
         //clone ensures we have a deep copy of the pen, so that we remeber the original color.
         Tuple<Pen, Rectangle, bool, Color> pen_and_rectangle_and_state = new Tuple<Pen, Rectangle, bool, Color>((Pen)this.pen.Clone(), this.rect, false, Color.Transparent);
 
 
-        //Tuple which hold the current starting point and the dimensions we have for the shape.
+        //Tuple which holds the current starting point and the dimensions we have for the shape.
         Tuple<Point, int, int> point_and_dimensions = new Tuple<Point, int, int>(SPoint, width, height);
 
 
@@ -795,10 +797,10 @@ public class ShapesBuilder : Form
             if (this.FoundPoint(firstPoint, secondPoint, current_point))//if the current point is within a shape's area. (returns tru or false)
             {
                 //Calculate the current difference.
-                int current_difference = (secondPoint.X * secondPoint.Y) - (current_point.X * secondPoint.Y);
+                int current_difference = (secondPoint.X * secondPoint.Y) - (current_point.X * current_point.Y);
 
                 //If the current difference is the less than the max_remainder 
-                //set the rectangle to fill, the current diffrence as the max remainder and the key of the max_remainder.
+                //set the rectangle to fill, the current diffrence as the max remainder and the current key of the max_remainder.
                 if (max_remainder < current_difference)
                 {
                     max_remainder = current_difference;
@@ -903,7 +905,12 @@ public class ShapesBuilder : Form
                 }
             }
         }
+
+
+
     }
+
+
 
 
 
