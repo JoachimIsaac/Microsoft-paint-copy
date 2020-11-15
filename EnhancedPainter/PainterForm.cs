@@ -6,7 +6,7 @@ Date:11/14/2020
 
 Course: CMPS4143, Fall 2020, Dr. Stringfellow.
 
-Purpose: To create  painter program that makes use of radio buttons and mouse event handlers, menus, combo box and graphics concepts.
+Purpose: To create painter program that makes use of radio buttons and mouse event handlers, menus, combo box and graphics concepts.
          This program draws lines, rectangles and ovals and also fills them.
 
 Noted Extra Credit:
@@ -40,8 +40,7 @@ namespace EnhancedPainter
         private ShapesBuilder SBuilder;
 
 
-
-
+        //Painter form constructor.
         public PainterForm()
         {
 
@@ -55,9 +54,8 @@ namespace EnhancedPainter
             SBuilder = new ShapesBuilder(graphics);
 
 
-            //As soon as we start we need to hide away the dimensions sections since the default drawing setting is lines.
+            //Hide the dimensions sections, since the default drawing setting is lines.
             HideDimensionsSection();
-
         }
 
 
@@ -116,7 +114,7 @@ namespace EnhancedPainter
 
 
         //Hides the size section and the line radio button.
-        //We hide the line button because we hide shapes when we fill a shape.
+        //Hides the line button because you can't fill a line.
         private void HideSizeSection()
         {
             SizegroupBox.Visible = false;
@@ -128,56 +126,64 @@ namespace EnhancedPainter
 
 
 
-        //When we press down on the mouse on the panel.
-        //This event is triggered and then we make decesions based 
-        //on what radio button is currently checked.
+        //Trigger on mouse down  on the panel.
+        //Decisions are made based on what radio button is currently checked.
         private void Canvaspanel_MouseDown(object sender, MouseEventArgs e)
         {
-            //if the line radio button is check, call the draw line fucntion.
-            if (LineradioButton.Checked)
+            try
             {
-                if (Draw_radioButton.Checked)
+                //if the line radio button is check, call the draw line fucntion.
+                if (LineradioButton.Checked)
                 {
-                    DrawLineOnCanvas(e);
+                    if (Draw_radioButton.Checked)
+                    {
+                        DrawLineOnCanvas(e);
+                    }
+                }
+                else if (RectangleradioButton.Checked)//if the rectangle radio button is checked 
+                {                                     //we call the draw rectangle fucntion or the fill. 
+                    SBuilder.setCurrentStartingState(true);
+
+                    if (SBuilder.isStarting() == true)
+                    {
+                        MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
+
+                        //If draw radio button is checked and we have valid dimensions draw a retangle on canvas.
+                        if (Draw_radioButton.Checked && Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
+                        {
+                            DrawRectangleOnCanvas(e);
+                        }
+                        else
+                        {//if fill radio button is checked fill the rectangle .
+                            FillRectangleOnCanvas(e);
+                        }
+                    }
+                }
+                else if (OvalradioButton.Checked)//if the oval radio button is checked
+                {                               //we call the draw oval function.
+                    SBuilder.setCurrentStartingState(true);
+
+                    //Enter if this is the starting point and both text boxes are filled.
+                    if (SBuilder.isStarting() == true)
+                    {
+                        MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
+
+                        //If draw radio button is checked and we have valid dimensions draw an oval on canvas.
+                        if (Draw_radioButton.Checked && Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
+                        {
+                            DrawOvalOnCanvas(e);
+                        }
+                        else//If fill radio button is checked, fill the oval/Ellispe .
+                        {
+                            FillEllispeOnCanvas(e);
+                        }
+                    }
                 }
             }
-            else if (RectangleradioButton.Checked)//if the rectangle radio button is checked 
-            {                                     //we call the draw rectangle fucntion or the fill. 
-                SBuilder.setCurrentStartingState(true);
-               
-                if (SBuilder.isStarting() == true)
-                {
-                    MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
-
-                    //If draw radio button is checked and we have valid dimensions draw a retangle on canvas.
-                    if (Draw_radioButton.Checked && Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
-                    {
-                        DrawRectangleOnCanvas(e);
-                    }
-                    else{//if fill radio button is checked fill the rectangle .
-                        FillRectangleOnCanvas(e);
-                    }
-                }
-            }
-            else if (OvalradioButton.Checked)//if the oval radio button is checked
-            {                               //we call the draw oval function.
-                SBuilder.setCurrentStartingState(true);
-
-                //Enter if this is the starting point and both text boxes are filled.
-                if (SBuilder.isStarting() == true)
-                {
-                    MouseLoactionlabel.Text = $"Starting point X:{e.X} | Y:{e.Y}";
-
-                    //If draw radio button is checked and we have valid dimensions draw an oval on canvas.
-                    if (Draw_radioButton.Checked && Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
-                    {
-                        DrawOvalOnCanvas(e);
-                    }
-                    else//If fill radio button is checked, fill the oval/Ellispe .
-                    {
-                        FillEllispeOnCanvas(e);
-                    }
-                }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message,"Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -227,7 +233,6 @@ namespace EnhancedPainter
         private void DrawRectangleOnCanvas(MouseEventArgs e)
         {
             //We only need to click once to draw.
-            // No try catch since we will only enter under specific conditions.
             if (SBuilder.isStarting() == true)
             {
                 //Set current start point.
@@ -242,7 +247,7 @@ namespace EnhancedPainter
                 //Draw rectangle on canvas.
                 SBuilder.DrawNewRectangle(dimnesions.Item1, dimnesions.Item2);
 
-                //Display mouse location
+                //Display mouse location.
                 MouseLoactionlabel.Text = $"Last Ending point X:{SBuilder.getEPoint().X} | Y:{SBuilder.getEPoint().Y}";
             }
         }
@@ -254,20 +259,19 @@ namespace EnhancedPainter
         //Draws the Oval/ellispe on the canvas.
         private void DrawOvalOnCanvas(MouseEventArgs e)
         {
-            //We only need to click once to draw.
-            // No try catch since we will only enter under specific conditions.
+            // We only need to click once to draw.
             if (SBuilder.isStarting() == true)
             {
                 //Set current start point.
                 SBuilder.setSPoint(new Point(e.X, e.Y));
 
-                //Ensure our state always starts as true for a rectangle.
+                //Ensure our state always starts as true for a shape.
                 SBuilder.setCurrentStartingState(true);
 
-                //Get the current rectangle dimensions.
+                //Get the current  dimensions.
                 Tuple<int, int> dimnesions = GetRectangleDimensions();
 
-                //Draw rectangle on canvas.
+                //Draw Ellipse on canvas.
                 SBuilder.DrawNewEllipse(dimnesions.Item1, dimnesions.Item2);
 
                 //Display mouse location.
@@ -300,7 +304,8 @@ namespace EnhancedPainter
             //Create point for current position.
             Point current_point = new Point(e.X, e.Y);
 
-            //If this point is in the area of a valid rectangle fill it.
+            //If this point is in the area of a valid Ellispe fill it.
+            //Since we pass in false, then it is not a rectangle, it is an Ellispe.
             this.SBuilder.Fill_Closest_Shape(current_point, false);
         }
 
@@ -321,20 +326,29 @@ namespace EnhancedPainter
 
         private Tuple<int, int> GetRectangleDimensions()
         {
-            //Grabs the dimensions within the width and height text boxes.
-            if (Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
+            try
             {
-                //We don't need a try catch since the text boxes will only accept integers.
-                int width = int.Parse(Width_textBox.Text);
-                int height = int.Parse(Height_textBox.Text);
+                //Grabs the dimensions within the width and height text boxes.
+                if (Width_textBox.Text.Length != 0 && Height_textBox.Text.Length != 0)
+                {
+                    int width = int.Parse(Width_textBox.Text);
+                    int height = int.Parse(Height_textBox.Text);
 
-                return new Tuple<int, int>(width, height);
+                    return new Tuple<int, int>(width, height);
+                }
+                else
+                {//default to zero if both text boxes are not filled.
+                    return new Tuple<int, int>(0, 0);
+                }
             }
-            else
-            {//default to zero if both text boxes are not filled.
-                return new Tuple<int, int>(0, 0);
+            catch(Exception ex)
+            {
+              MessageBox.Show(ex.Message, "Error",
+              MessageBoxButtons.OK, MessageBoxIcon.Error);
+              return new Tuple<int, int>(0, 0);
             }
 
+            
         }
 
 
@@ -370,7 +384,7 @@ namespace EnhancedPainter
         //Actives the button to choose color
         private void ChooseColorbutton_Click(object sender, EventArgs e)
         {
-            OpenColorChooser();//opends color chooser dialog box.
+            OpenColorChooser();//opens color chooser dialog box.
         }
 
 
@@ -475,7 +489,7 @@ public class ShapesBuilder : Form
 {
     public Graphics graphics;
 
-    public bool StartingPoint = true;
+    private bool StartingPoint = true;
 
     private Point SPoint;
     private Point EPoint;
@@ -489,8 +503,8 @@ public class ShapesBuilder : Form
 
     private List<Tuple<Pen, Rectangle>> ListRecsForEllipse = new List<Tuple<Pen, Rectangle>>();
 
-    Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>> Rectangles_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>>();
-    Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>> Ellipses_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>>();
+    private Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>> Rectangles_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>>();
+    private Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>> Ellipses_and_AreasToFill = new Dictionary<Tuple<Point, int, int>, Tuple<Pen, Rectangle, bool, Color>>();
 
 
 
@@ -500,6 +514,8 @@ public class ShapesBuilder : Form
     {
         this.graphics = g;
     }
+
+
 
 
     //Gets current pen
@@ -574,7 +590,7 @@ public class ShapesBuilder : Form
 
 
 
-    //Sets the setting point.
+    //Sets the ending point.
     public void setEPoint(Point p1)
     {
         EPoint = p1;
@@ -582,7 +598,7 @@ public class ShapesBuilder : Form
 
 
 
-    //Gets the setting point.
+    //Gets the ending point.
     public Point getEPoint()
     {
         return EPoint;
@@ -591,7 +607,7 @@ public class ShapesBuilder : Form
 
 
 
-    //Returns true if it is a starting point.
+    //Returns true if the current clicking state is the starting point.
     public bool isStarting()
     {
         return StartingPoint;
@@ -601,7 +617,7 @@ public class ShapesBuilder : Form
 
 
 
-    //Clears all the points in our point lists and the Dictionaries.
+    //Clears all the points and shapes in our point/shapes lists and the Dictionaries.
     public void ClearListsOfShapes()
     {
         ListOfLinePoints.Clear();
@@ -624,9 +640,9 @@ public class ShapesBuilder : Form
 
 
     //Adds points to list of points.
-    public void AddLineToListOfLines(Tuple<Pen, Point, Point> points)
+    public void AddLineToListOfLines(Tuple<Pen, Point, Point> pen_and_points)
     {
-        this.ListOfLinePoints.Add(points);
+        this.ListOfLinePoints.Add(pen_and_points);
     }
 
 
@@ -657,7 +673,7 @@ public class ShapesBuilder : Form
 
 
         //Create a tuple that holds the pen,rectangle, filled state represented by bool, and Color.
-        //clone ensures we have a deep copy of the pen, so that we remeber the original color.
+        //Clone ensures we have a deep copy of the pen, so that we remeber the original color.
         Tuple<Pen, Rectangle, bool, Color> pen_and_rectangle_and_state = new Tuple<Pen, Rectangle, bool, Color>((Pen)this.pen.Clone(), this.rect, false, Color.Transparent);
 
         //Tuple which hold the current starting point and the dimensions we have for the shape.
@@ -668,7 +684,7 @@ public class ShapesBuilder : Form
         this.ListOfRectangles.Add(pen_and_rectangle);
 
 
-        //Add the tuples of point and dimensions as the key of our dictionary and the tuple with the pen, rectangle, fill state and color.
+        //Add the tuple of point and dimensions as the key of our dictionary and the tuple with the pen, rectangle, fill state and color as the value.
         this.Rectangles_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle_and_state);
 
     }
@@ -700,7 +716,7 @@ public class ShapesBuilder : Form
         this.ListRecsForEllipse.Add(pen_and_rectangle);
 
 
-        //Add the tuples of point and dimensions as the key of our dictionary and the tuple with the pen, rectangle, fill state and color.
+        //Add the tuple of point and dimensions as the key of our dictionary and the tuple with the pen, rectangle, fill state and color as the value.
         this.Ellipses_and_AreasToFill.Add(point_and_dimensions, pen_and_rectangle_and_state);
 
     }
@@ -720,7 +736,7 @@ public class ShapesBuilder : Form
             Rectangle rectToFill = this.pick_rectangle_to_fill(this.Rectangles_and_AreasToFill, current_point);
 
 
-            //If we get no Rectangle do nothing.
+            //If we get an invalid Rectangle or no Rectangle do nothing.
             if (rectToFill.Width == 0 && rectToFill.Height == 0 && rectToFill.X == 0 && rectToFill.Y == 0)
             {
                 return;
@@ -736,7 +752,7 @@ public class ShapesBuilder : Form
             //Finds the nearest Ellispe to fill.
             Rectangle rectToFill = this.pick_rectangle_to_fill(this.Ellipses_and_AreasToFill, current_point);
 
-            //If we get no Ellispe do nothing.
+            //If we get no Ellispe or an invalid Ellispe do nothing.
             if (rectToFill.Width == 0 && rectToFill.Height == 0 && rectToFill.X == 0 && rectToFill.Y == 0)
             {
                 return;
@@ -758,19 +774,25 @@ public class ShapesBuilder : Form
         //Holds the max difference of the nearest area to fill and the current point area.
         int max_remainder = int.MinValue;// formula for differnece ==> area - (current_pointX * current_pointY)
 
-        Rectangle rectToFill = new Rectangle(0, 0, 0, 0);//holds the rectangle to fill.
+        Rectangle rectToFill = new Rectangle(0, 0, 0, 0);//holds the rectangle to fill, we initailze it with an invalid rectangle.
 
         Tuple<Point, int, int> key = new Tuple<Point, int, int>(new Point(0, 0), 0, 0);// holds the key of the max_remainder.
 
 
+        //kvp == key pair value
         foreach (var kvp in shapes_and_points)//Loops through the Dictionary of points, rectangles, colors and fill state.
         {
-            Point firstPoint = new Point(kvp.Key.Item1.X, kvp.Key.Item1.Y);//load first point 
-            Point secondPoint = new Point(kvp.Key.Item1.X + kvp.Key.Item2, kvp.Key.Item1.Y + kvp.Key.Item3);//load second point
+            Point firstPoint = new Point(kvp.Key.Item1.X, kvp.Key.Item1.Y);//loads first point 
+
+            //We add the dimensions to the orginal points to get our second point
+            //e.g point 0 + a width of 400 means our second point is 400.
+            int secondPointX = kvp.Key.Item1.X + kvp.Key.Item2;
+            int secondPointY = kvp.Key.Item1.Y + kvp.Key.Item3;
+            Point secondPoint = new Point(secondPointX, secondPointY);//loads second point
 
 
 
-            if (this.FoundPoint(firstPoint, secondPoint, current_point))//if the current point is within a shape's area.
+            if (this.FoundPoint(firstPoint, secondPoint, current_point))//if the current point is within a shape's area. (returns tru or false)
             {
                 //Calculate the current difference.
                 int current_difference = (secondPoint.X * secondPoint.Y) - (current_point.X * secondPoint.Y);
@@ -786,10 +808,10 @@ public class ShapesBuilder : Form
             }
         }
 
-        // if the key is in the Dictionary
+        // if the key with the largest remainder is in the Dictionary
         if (shapes_and_points.ContainsKey(key))
         {
-            //Reset the value of the dictionaty so that we change the current fill state to true and the current color 
+            //Reset the value of the dictionary so that we change the current fill state to true and the current color 
             shapes_and_points[key] = new Tuple<Pen, Rectangle, bool, Color>(shapes_and_points[key].Item1, shapes_and_points[key].Item2, true, this.pen.Color);
 
             return rectToFill;
